@@ -1,14 +1,8 @@
 package com.example.loginapi.entity;
 
 import jakarta.persistence.*;
-//import lombok.*;
 
 @Entity
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Data
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 public class User {
 

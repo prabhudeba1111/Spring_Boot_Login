@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/auth")
 public class AuthController extends User {
     @Autowired
     UserDetailsServiceImpl userDetailsServiceImpl;
@@ -33,7 +34,7 @@ public class AuthController extends User {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
         if (!userVerify.authenticate(request.getEmail(), request.getPassword())){
-            throw new BadCredentialsException(" Invalid Username or Password  !!");
+            throw new BadCredentialsException("Invalid Username or Password  !!");
         }
         UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(request.getEmail());
         String token = this.helper.generateToken(userDetails);
@@ -51,7 +52,7 @@ public class AuthController extends User {
         if (!request.getPassword().equals(request.getConfirmPassword())){
             return ResponseEntity.badRequest().body(new MessageResponse("Passwords don't match."));
         }
-        
+
         User user = new User(request.getName(),
                 request.getEmail(),
                 encoder.encode(request.getPassword()),
@@ -62,5 +63,25 @@ public class AuthController extends User {
 
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User Registered Successfully"));
+    }
+
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout(HttpServletRequest request){
+//        String token = this.helper.extractTokenFromRequest(request);
+//        if (token!=null) {
+//            this.helper.invalidateToken(token);
+//            return ResponseEntity.ok(new MessageResponse("Logged Out Successfully"));
+//        }
+//        return ResponseEntity.badRequest().body(new MessageResponse("Failed to logout"));
+//    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        String token = this.helper.extractTokenFromRequest();
+        if (token!=null) {
+            this.helper.invalidateToken(token);
+            return ResponseEntity.ok(new MessageResponse("Logged Out Successfully"));
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("Failed to logout"));
     }
 }

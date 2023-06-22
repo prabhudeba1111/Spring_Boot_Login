@@ -48,7 +48,7 @@ public class AuthController extends User {
         if (userRepository.existsByEmail(request.getEmail())){
             return ResponseEntity.badRequest().body(new MessageResponse("Email already in use."));
         }
-        if (request.getPassword().equals(request.getConfirmPassword())){
+        if (!request.getPassword().equals(request.getConfirmPassword())){
             return ResponseEntity.badRequest().body(new MessageResponse("Passwords don't match."));
         }
         

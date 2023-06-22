@@ -16,10 +16,7 @@ public class UserVerify {
 
     public boolean authenticate(String email, String password){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-        System.out.println(password);
-        System.out.println(user.getPassword());
-
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid Username or Password  !!"));
 //        return user.getPassword().equalsIgnoreCase(password);
         return encoder.matches(password, user.getPassword());
     }

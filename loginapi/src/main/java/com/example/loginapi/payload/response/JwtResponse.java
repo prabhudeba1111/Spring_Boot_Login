@@ -1,6 +1,5 @@
 package com.example.loginapi.payload.response;
 
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @Getter

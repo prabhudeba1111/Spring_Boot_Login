@@ -1,0 +1,19 @@
+package com.example.loginapi.service;
+
+import com.example.loginapi.entity.user.Token;
+import com.example.loginapi.repository.TokenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class Tokenop {
+    @Autowired
+    TokenRepository tokenRepository;
+
+    public Token findToken(String email){
+        Optional<Token> opt = tokenRepository.findByEmail(email);
+        return opt.get();
+    }
+}

@@ -22,12 +22,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        System.out.println("Started");
         http.csrf(csrf -> csrf.disable())
                 .authorizeRequests()
                 .requestMatchers(HttpMethod.POST,"/test").authenticated()
-                .requestMatchers(HttpMethod.POST,"/login").permitAll()
-                .requestMatchers(HttpMethod.POST,"/signup").permitAll()
+                .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/to").permitAll()
+                .requestMatchers(HttpMethod.POST,"/auth/signup").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))

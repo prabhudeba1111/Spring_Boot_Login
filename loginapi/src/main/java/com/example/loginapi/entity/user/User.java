@@ -1,14 +1,11 @@
 package com.example.loginapi.entity.user;
 
+import com.example.loginapi.entity.blog.Post;
 import jakarta.persistence.*;
-//import lombok.*;
+
+import java.util.List;
 
 @Entity
-//@Getter
-//@Setter
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Data
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 public class User {
     @Id
@@ -21,7 +18,7 @@ public class User {
     private String address;
     private String state;
     private String zip;
-
+    
     public User(){
     }
     public User(String name, String email, String password, String phone, String address, String state, String zip) {

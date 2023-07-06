@@ -2,8 +2,9 @@ package com.example.loginapi.security;
 
 import com.example.loginapi.entity.user.Token;
 import com.example.loginapi.repository.TokenRepository;
-import com.example.loginapi.service.Tokenop;
+import com.example.loginapi.service.TokenService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -22,11 +23,11 @@ import java.util.function.Function;
 @Component
 public class JwtHelper {
     @Autowired
-    Tokenop tokenop;
+    TokenService tokenService;
     @Autowired
     TokenRepository tokenRepository;
 
-    public static final long JWT_TOKEN_VALIDITY = 30 * 60 * 1000;
+    public static final long JWT_TOKEN_VALIDITY = 60 * 60 * 1000;
 
     private String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
 
@@ -48,15 +49,24 @@ public class JwtHelper {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
+    }
+
+    public Boolean isExpired(String token){
+        try {
+            final Date expiration = getExpirationDateFromToken(token);
+            return false;
+        } catch (io.jsonwebtoken.ExpiredJwtException e){
+            return true;
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         String token = doGenerateToken(claims, userDetails.getUsername());
-        Token token1 = tokenop.findToken(userDetails.getUsername());
+        Token token1 = tokenService.findToken(userDetails.getUsername());
         token1.setToken(token);
         tokenRepository.save(token1);
         return token;
@@ -67,6 +77,7 @@ public class JwtHelper {
     //2. Sign the JWT using the HS512 algorithm and secret key.
     //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
     //   compaction of the JWT to a URL-safe string
+
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
@@ -75,13 +86,13 @@ public class JwtHelper {
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String email = getUsernameFromToken(token);
-        Token token1 = tokenop.findToken(email);
+        Token token1 = tokenService.findToken(email);
         return email.equals(userDetails.getUsername()) && token.equals(token1.getToken()) && !isTokenExpired(token);
     }
 
     public void invalidateToken(String token) {
         String email = getUsernameFromToken(token);
-        Token token1 = tokenop.findToken(email);
+        Token token1 = tokenService.findToken(email);
         token1.setToken(null);
         tokenRepository.save(token1);
     }

@@ -8,6 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class CommentRequest {
-    private String title;
     private String content;
 }

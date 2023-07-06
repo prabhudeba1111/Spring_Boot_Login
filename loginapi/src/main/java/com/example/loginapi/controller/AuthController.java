@@ -9,7 +9,7 @@ import com.example.loginapi.payload.response.MessageResponse;
 import com.example.loginapi.repository.TokenRepository;
 import com.example.loginapi.repository.UserRepository;
 import com.example.loginapi.security.JwtHelper;
-import com.example.loginapi.service.Tokenop;
+import com.example.loginapi.service.TokenService;
 import com.example.loginapi.service.UserDetailsServiceImpl;
 import com.example.loginapi.service.UserVerify;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class AuthController{
     @Autowired
     UserVerify userVerify;
     @Autowired
-    Tokenop tokenop;
+    TokenService tokenService;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -41,26 +41,23 @@ public class AuthController{
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
+        System.out.println("Login Start");
         if (!userVerify.authenticate(request.getEmail(), request.getPassword())){
             throw new BadCredentialsException("Invalid Username or Password  !!");
         }
-        Token token1 = tokenop.findToken(request.getEmail());
-        if (token1.getToken()==null) {
-            UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(request.getEmail());
-            String token = helper.generateToken(userDetails);
+        Token token1 = tokenService.findToken(request.getEmail());
+        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(request.getEmail());
+        String token = null;
+        System.out.println("going to validate");
+        if (token1.getToken()==null || helper.isExpired(token1.getToken())) {
+            token = helper.generateToken(userDetails);
         }
         JwtResponse response = JwtResponse.builder()
                 .jwtToken(token1.getToken())
-                .username(token1.getEmail()).build();
+                .username(request.getEmail()).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/to")
-    public void to(@RequestBody Token token){
-        Token temp = tokenop.findToken(token.getEmail());
-        temp.setToken(token.getToken());
-        tokenRepository.save(temp);
-    }
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request){
         if (userRepository.existsByEmail(request.getEmail())){
@@ -87,9 +84,12 @@ public class AuthController{
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(){
+        System.out.println("logout start");
         String token = helper.extractTokenFromRequest();
+        System.out.println("got token");
         if (token!=null) {
             helper.invalidateToken(token);
+            System.out.println("token nivalidated");
             SecurityContextHolder.getContext().setAuthentication(null);
             return ResponseEntity.ok(new MessageResponse("Logged Out Successfully"));
         }

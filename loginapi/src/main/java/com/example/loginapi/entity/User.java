@@ -1,11 +1,13 @@
-package com.example.loginapi.entity;
+package com.example.loginapi.entity.user;
 
+import com.example.loginapi.entity.blog.Post;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userid;

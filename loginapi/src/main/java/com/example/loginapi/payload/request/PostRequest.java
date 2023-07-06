@@ -8,5 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class PostRequest {
+    private String title;
     private String content;
 }

@@ -32,5 +32,24 @@ public class PostService {
             return null;
         }
     }
+    
+    public ArrayList<PostResponse> convertToReturn(ArrayList<Post> Posts){
+        ArrayList<PostResponse> posts = new ArrayList<>();
+        for(Post post: Posts){
+            posts.add(postResponse(post));
+        }
+        return posts;
+    }
 
+    public PostResponse postResponse(Post post){
+        long id = post.getId();
+        ArrayList<String> comments = commentService.findAllByPost(id);
+        PostResponse response = PostResponse.builder()
+                .username(userVerify.usernameFromEmail(post.getEmail()))
+                .title(post.getTitle())
+                .content(post.getContent())
+                .created(post.getCreated())
+                .comments(comments).build();
+        return response;
+    }
 }

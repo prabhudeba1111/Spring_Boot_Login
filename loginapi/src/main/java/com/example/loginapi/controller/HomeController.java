@@ -23,15 +23,29 @@ public class HomeController {
     UserVerify userVerify;
     @RequestMapping("/")
     public String welcome(Principal principal) {
-        User user = userVerify.loadUser(principal.getName());
-        return "Welcome " + user.getName() + ".";
+        String username = userVerify.usernameFromEmail(principal.getName());
+        return "Welcome " + username + ".";
     }
 
     @RequestMapping("/home")
-    public ArrayList<Post> showAllPosts(){
+    public ArrayList<PostResponse> showAllPosts(){
         ArrayList<Post> posts = postService.findAllPosts();
         Collections.reverse(posts);
-        return posts;
+        ArrayList<PostResponse> responses = postService.convertToReturn(posts);
+        return responses;
     }
 
+    @RequestMapping("/profile")
+    public ProfileResponse profile(Principal principal){
+        User user = userVerify.loadUser(principal.getName());
+        ProfileResponse response = ProfileResponse.builder()
+                .name(user.getName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .state(user.getState())
+                .zip(user.getZip()).build();
+        return response;
+    }
 }

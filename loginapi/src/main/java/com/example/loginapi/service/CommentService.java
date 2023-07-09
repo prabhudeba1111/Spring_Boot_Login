@@ -15,17 +15,20 @@ public class CommentService {
     @Autowired
     CommentRepository commentRepository;
 
-    public ArrayList<Comment> findAllByPost(long id){
-        return (ArrayList<Comment>) commentRepository.findAllByPost(id);
+    private ArrayList<String> commentString(ArrayList<Comment> Comments){
+        ArrayList<String> comments = new ArrayList<>();
+        for (Comment comment: Comments){
+            comments.add(comment.getContent());
+        }
+        return comments;
+    }
+    
+    public ArrayList<String> findAllByPost(long id){
+        return commentString((ArrayList<Comment>) commentRepository.findAllByPost(id));
     }
 
     public Comment findById(long id){
         Optional<Comment> opt = commentRepository.findById(id);
-        if (opt.isPresent()){
-            return opt.get();
-        }
-        else{
-            return null;
-        }
+        return opt.orElse(null);
     }
 }

@@ -40,21 +40,16 @@ public class PostController {
     }
 
     @RequestMapping("/me")
-    public ArrayList<Post> showAllById(Principal principal){
+    public ArrayList<PostResponse> showAllById(Principal principal){
         ArrayList<Post> posts = postService.findAllByEmail(principal.getName());
-        return posts;
+        ArrayList<PostResponse> responses = postService.convertToReturn(posts);
+        return responses;
     }
+    
     @RequestMapping("/{id}")
     public ResponseEntity<PostResponse> showById(@PathVariable long id){
         Post post = postService.findById(id);  //comment add karna
-        ArrayList<Comment> comments = commentService.findAllByPost(id);
-
-        PostResponse response = PostResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .created(post.getCreated())
-                .comments(comments).build();
+        PostResponse response = postService.postResponse(post);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -41,20 +41,16 @@ public class AuthController{
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request) {
-        System.out.println("Login Start");
         if (!userVerify.authenticate(request.getEmail(), request.getPassword())){
             throw new BadCredentialsException("Invalid Username or Password  !!");
         }
         Token token1 = tokenService.findToken(request.getEmail());
-        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(request.getEmail());
-        String token = null;
-        System.out.println("going to validate");
         if (token1.getToken()==null || helper.isExpired(token1.getToken())) {
-            token = helper.generateToken(userDetails);
+            helper.generateToken(request.getEmail());
         }
         JwtResponse response = JwtResponse.builder()
                 .jwtToken(token1.getToken())
-                .username(request.getEmail()).build();
+                .email(request.getEmail()).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -84,15 +80,9 @@ public class AuthController{
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(){
-        System.out.println("logout start");
         String token = helper.extractTokenFromRequest();
-        System.out.println("got token");
-        if (token!=null) {
-            helper.invalidateToken(token);
-            System.out.println("token nivalidated");
-            SecurityContextHolder.getContext().setAuthentication(null);
-            return ResponseEntity.ok(new MessageResponse("Logged Out Successfully"));
-        }
-        return ResponseEntity.badRequest().body(new MessageResponse("Failed to logout"));
+        helper.invalidateToken(token);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return ResponseEntity.ok(new MessageResponse("Logged Out Successfully"));
     }
 }

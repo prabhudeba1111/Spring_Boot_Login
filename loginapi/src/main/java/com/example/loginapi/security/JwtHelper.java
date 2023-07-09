@@ -4,7 +4,6 @@ import com.example.loginapi.entity.user.Token;
 import com.example.loginapi.repository.TokenRepository;
 import com.example.loginapi.service.TokenService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -29,7 +28,7 @@ public class JwtHelper {
 
     public static final long JWT_TOKEN_VALIDITY = 60 * 60 * 1000;
 
-    private String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
+    final String secret = "afafasfafafasfasfasfafacasdasfasxASFACASDFACASDFASFASFDAFASFASDAADSCSDFADCVSGCFVADXCcadwavfsfarvf";
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -44,7 +43,7 @@ public class JwtHelper {
         return claimsResolver.apply(claims);
     }
 
-    //for retrieveing any information from token we will need the secret key
+    //for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
@@ -56,17 +55,17 @@ public class JwtHelper {
 
     public Boolean isExpired(String token){
         try {
-            final Date expiration = getExpirationDateFromToken(token);
+            getExpirationDateFromToken(token);
             return false;
         } catch (io.jsonwebtoken.ExpiredJwtException e){
             return true;
         }
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        String token = doGenerateToken(claims, userDetails.getUsername());
-        Token token1 = tokenService.findToken(userDetails.getUsername());
+        String token = doGenerateToken(claims, username);
+        Token token1 = tokenService.findToken(username);
         token1.setToken(token);
         tokenRepository.save(token1);
         return token;
@@ -100,10 +99,7 @@ public class JwtHelper {
     public String extractTokenFromRequest() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
+        return header.substring(7);
     }
 
 }

@@ -16,5 +16,5 @@ public class PostResponse {
     private String title;
     private String content;
     private LocalDateTime created;
-    ArrayList<Comment> comments;
+    ArrayList<String> comments;
 }

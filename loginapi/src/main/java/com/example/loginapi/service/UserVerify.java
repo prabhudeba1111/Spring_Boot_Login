@@ -26,4 +26,8 @@ public class UserVerify {
         return userRepository.findByEmail(email).get();
     }
 
+    public String usernameFromEmail(String email){
+        return userRepository.findByEmail(email).get().getUsername();
+    }
+
 }

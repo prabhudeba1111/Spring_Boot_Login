@@ -1,5 +1,6 @@
 package com.example.loginapi.controller;
 
+import com.example.loginapi.config.SecurityConfig;
 import com.example.loginapi.entity.user.Token;
 import com.example.loginapi.entity.user.User;
 import com.example.loginapi.payload.request.LoginRequest;
@@ -64,6 +65,7 @@ public class AuthController{
         }
 
         User user = new User(request.getName(),
+                request.getUsername(),
                 request.getEmail(),
                 encoder.encode(request.getPassword()),
                 request.getPhone(),

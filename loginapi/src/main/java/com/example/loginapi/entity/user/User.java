@@ -1,34 +1,41 @@
 package com.example.loginapi.entity.user;
 
-import com.example.loginapi.entity.blog.Post;
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email"), @UniqueConstraint(columnNames = "username")})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userid;
     private String name;
+    private String username;
     private String email;
     private String password;
     private String phone;
     private String address;
     private String state;
     private String zip;
-    
+
     public User(){
     }
-    public User(String name, String email, String password, String phone, String address, String state, String zip) {
+    public User(String name, String username, String email, String password, String phone, String address, String state, String zip) {
         this.name = name;
+        this.username = username;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.address = address;
         this.state = state;
         this.zip = zip;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public long getUserid() {
